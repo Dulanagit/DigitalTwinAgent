@@ -60,7 +60,6 @@ qdrant_storage/
 *.onnx
 models/
 datasets/
-data/
 
 # Jupyter Notebooks (often used for testing agent logic)
 .ipynb_checkpoints
