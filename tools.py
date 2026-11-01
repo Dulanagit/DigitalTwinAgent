@@ -27,12 +27,16 @@ def send_telegram_notification(message):
 
 
 
-def record_user_details(email, name="not provided", notes="not provided"):  
+def record_user_details(email, name, notes="not provided"):  
     send_telegram_notification(f"Recording user with \nname: {name}\nemail: {email}\nnotes: {notes}")
     return "OK"
 
 def record_unknown_question(question, name="not provided", notes="not provided"):
     send_telegram_notification(f"The person with name: {name} asks question: {question} with notes: {notes}")
+    return "OK"
+
+def record_other_contact_details(contact, name, notes="not provided"):
+    send_telegram_notification(f"Recording user with \nname: {name}\ncontact: {contact}\nnotes: {notes}")
     return "OK"
 
 record_user_details_json = { 
@@ -41,11 +45,11 @@ record_user_details_json = {
     "parameters": {
         "type": "object",
         "properties": {
-            "email": {"type": "string", "description":"email provided by the user"},
+            "email": {"type": "string", "description":"email provided by the user"},  
             "name": {"type": "string", "description": "name of the user that is providing the email"},
             "notes": {"type": "string", "description": "Any additional info about the conversation that's worth recording to give context"}
         },
-        "required": ["email"],
+        "required": ["email","name"],
         "additionalProperties": False
     }
 }
@@ -61,6 +65,21 @@ record_unknown_question_json = {
             "notes": {"type": "string", "description": "Any additional info about the conversation that's worth recording to give context"}
         },
         "required": ["question"],
+        "additionalProperties": False
+    }
+}
+
+record_other_contact_details_json={
+    "name": "record_other_contact_details",
+    "description": "records any contact details provided by the user if it is not an email, along with name and notes",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "contact": {"type": "string", "description":"any contact detail provided by the user except email."},  
+            "name": {"type": "string", "description": "name of the user that is providing the email"},
+            "notes": {"type": "string", "description": "Any additional info about the conversation that's worth recording to give context"}
+        },
+        "required": ["contact","name"],
         "additionalProperties": False
     }
 }
@@ -96,7 +115,8 @@ def handle_tool_calls(tool_calls):
 
 TWIN_TOOLS=[
     {"type":"function", "function": record_user_details_json},
-    {"type":"function", "function": record_unknown_question_json}
+    {"type":"function", "function": record_unknown_question_json},
+    {"type":"function", "function":record_other_contact_details_json}
 ]
 
 EVALUATOR_TOOLS=[
